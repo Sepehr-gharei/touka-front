@@ -238,4 +238,86 @@ jQuery(document).ready(function ($) {
             $('.main-header').removeClass('fixed');
         }
     });
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                $(entry.target).addClass('animate active');
+                
+                // هندل کردن اختصاصی بخش هیرو برای عکس
+                if ($(entry.target).hasClass('bg-icon')) {
+                    setTimeout(() => {
+                        $('.hero-header-section').addClass('show-image');
+                    }, 200);
+                }
+            }
+        });
+    }, { threshold: 0.1 });
+
+    // انتخاب تمام بخش‌هایی که باید موقع اسکرول انیمیشن بگیرند
+    $('.bg-icon, .feather, .banner-item .icon, .category-items-section .item, .main-cart-theme').each(function() {
+        if (!$(this).hasClass('bg-icon')) $(this).addClass('reveal');
+        observer.observe(this);
+    });
+    // ==========================================
+// Text Content FAQ Accordion Logic
+// ==========================================
+$(document).ready(function() {
+    
+    // انتخاب هدرهای آکاردئون
+    $('.text-content-faq-section .faq-header').on('click', function() {
+        var item = $(this).closest('.faq-item');
+        var content = item.find('.faq-content');
+        
+        // اگر آیتم کلیک شده از قبل باز است، آن را ببند
+        if (item.hasClass('active')) {
+            content.css('max-height', '0');
+            item.removeClass('active');
+        } else {
+            // بستن سایر آیتم‌ها (اختیاری - اگر می‌خواهید فقط یکی باز باشد)
+            $('.text-content-faq-section .faq-item.active').removeClass('active').find('.faq-content').css('max-height', '0');
+            
+            // باز کردن آیتم جدید
+            item.addClass('active');
+            // تنظیم ارتفاع بر اساس محتوا
+            var scrollHeight = content.prop('scrollHeight');
+            content.css('max-height', scrollHeight + 'px');
+        }
+    });
+
+    // تنظیم ارتفاع اولیه برای آیتمی که در HTML کلاس active دارد
+    var activeItem = $('.text-content-faq-section .faq-item.active .faq-content');
+    if (activeItem.length) {
+        var scrollHeight = activeItem.prop('scrollHeight');
+        activeItem.css('max-height', scrollHeight + 'px');
+    }
+});
+$(document).ready(function() {
+    // Smooth Scrolling for nav links
+    $('.course-nav-wrapper a.nav-link').on('click', function(event) {
+        if (this.hash !== "") {
+            event.preventDefault();
+            var hash = this.hash;
+            
+            // چون نوار دیگر استیکی نیست، فقط بر اساس موقعیت سکشن اسکرول می‌کنیم
+            // اگر هدر اصلی (main-header) روی محتوا را می‌پوشاند، ارتفاع آن را کم می‌کنیم
+            var headerHeight = $('.main-header.fixed').length ? 80 : 0; 
+
+            $('html, body').animate({
+                scrollTop: $(hash).offset().top - headerHeight
+            }, 800);
+        }
+    });
+
+    // Active link switching on scroll
+    $(window).scroll(function() {
+        var scrollDistance = $(window).scrollTop() + 100; // مقدار افست برای تشخیص سکشن فعال
+
+        $('section[id]').each(function(i) {
+            if ($(this).offset().top <= scrollDistance) {
+                $('.course-nav-wrapper a.nav-link.active').removeClass('active');
+                $('.course-nav-wrapper a.nav-link').eq(i).addClass('active');
+            }
+        });
+    });
+});
 });
